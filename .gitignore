@@ -1,3 +1,5 @@
 credentials.py
 recursos/
 venv/
+.idea/
+__pycache__/
