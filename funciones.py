@@ -1,6 +1,11 @@
 import pyaudio
 import wave
 import re
+import xml.etree.ElementTree as ET
+import os
+from xml.dom import minidom
+from datetime import datetime
+import socket
 
 # Función que graba desde el micrófono. Se le pasará por parámetro el fichero de
 # sonido en formato mp3, la duración de la grabación, y la etiqueta de la interfaz para informar al usuario que se
@@ -118,3 +123,52 @@ def encontrarPosicionDistinta(lista_anterior, lista_nueva):
         if lista_anterior[i] != lista_nueva[i]:
             return i
     return None
+
+# Esta función se encarga de guardar información sobre la partida, como la hora de inicio y fin, el nombre
+# del equipo, tablero final y el ganador.
+def guardarInfo(hora_inicio, lista_tablero, j_ganador):
+
+    rutaXml = "./recursos/datos.xml"
+
+    if os.path.exists(rutaXml):
+        tree = ET.parse(rutaXml)
+        root = tree.getroot()
+    else:
+        root = ET.Element("registros")
+
+    ejecucion = ET.Element("ejecucion")
+
+    equipo = ET.Element("equipo")
+    equipo.text = socket.gethostname()
+    ejecucion.append(equipo)
+
+    now = datetime.now()
+
+    hora = ET.Element("hora")
+    h_inicio = ET.Element("inicio")
+    h_inicio.text = hora_inicio
+    hora.append(h_inicio)
+    h_fin = ET.Element("fin")
+    h_fin.text = str(now.hour) + ":" + str(now.minute) + ":" + str(now.second)
+    hora.append(h_fin)
+    ejecucion.append(hora)
+
+    tablero = ET.Element("tablero")
+    tablero.text = '|'.join(str(elem) for elem in lista_tablero)
+    ejecucion.append(tablero)
+
+    ganador = ET.Element("ganador")
+    ganador.text = j_ganador
+    ejecucion.append(ganador)
+
+    root.append(ejecucion)
+
+    with open(rutaXml, "wb") as xml:
+        xml.write(formatearXml(root).encode("utf-8"))
+    return
+
+# Funcion para formatear xml
+def formatearXml(elem):
+    rough_string = ET.tostring(elem,"utf-8")
+    reparsed = minidom.parseString(rough_string)
+    return '\n'.join([line for line in reparsed.toprettyxml(indent=' ' * 2).split('\n') if line.strip()])

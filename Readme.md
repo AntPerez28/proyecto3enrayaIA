@@ -53,6 +53,10 @@ Este fichero se proporciona en el proyecto y contiene las funciones:
 
 - `encontrarPosicionDistinta`: Función que compara el tablero actual con el tablero de ChatGPT, obtiene la posición distinta.
 
+- `guardarInfo`: Función para guardar información de la aplicación en un xml llamado `datos.xml` en la carpeta `recursos`, si no existe se creará automáticamente.
+
+- `formatearXml`: Función que se encargará de formatear el xml para que sea más bonito visualmente.
+
 Todas estas funciones son necesarias para realizar diversas funciones importantes, procesar y estructurar los datos.
 
 Para funcionar necesitará las librerias `pyaudio`, `wave` y `re`.
@@ -83,8 +87,25 @@ Este fichero se proporciona con el proyecto.
 ### recursos/
 
 <div style="text-align: justify;">
-Esta carpeta no se proporciona con el proyecto por lo que habrá que crearla, contendrá el fichero de audio donde se grabará la jugada del usuario. El fichero se creará automaticamente al primera vez que se realice una grabación. El nombre de ese fichero será `audio.mp3`.
+Esta carpeta no se proporciona con el proyecto por lo que habrá que crearla, contendrá el fichero de audio donde se grabará la jugada del usuario, y el fichero de datos con información de la partida. Estos fichero se crearán automaticamente, por lo que solo será necesario crear la carpeta vacía. El nombre del fichero de es "audio.mp3", y el de datos "datos.xml".
 </div>
+
+## Librerías utilizadas
+
+<div style="text-align: justify;">
+Se han usado varias librerías para el funcionamiento de la aplicación. Estos son sus usos en la aplicación:
+</div>
+
+- `openai`: Para trabajar con la API de OpenAI.
+- `pyaudio`: Para poder realizar grabación de audio.
+- `tkinter`: Para realizar la interfaz.
+- `datetime`: Para recoger la hora del equipo.
+- `wave`: Para poder trabajar con los ficheros de audio.
+- `re`: Para trabajar con expresiones regulares.
+- `ElementTree`: Para crear elementos xml.
+- `os`: Para trabajar con rutas.
+- `minidom`: Para formatear xml.
+- `socket`: Para recoger información del equipo.
 
 ## Puesta a punto
 

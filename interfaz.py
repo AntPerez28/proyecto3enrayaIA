@@ -1,6 +1,7 @@
 import tkinter as tk
 import funciones
 import openaiAPI
+from datetime import datetime
 
 # He ido haciendo la interfaz con la documentación de tkinter (https://docs.python.org/es/3/library/tkinter.html)
 # y preguntanto a chatGPT.
@@ -16,12 +17,16 @@ class InterfazTresEnRaya:
         self.tablero = [None] * 9
         self.lista_tablero = [None] * 9
 
+        # Guardamos en un atributo la hora de inicio del juego.
+        now = datetime.now()
+        self.hora_inicio = str(now.hour) + ":" + str(now.minute) + ":" + str(now.second)
+
         # Aquí crearemos el tablero de la interfaz, y etiquetaremos cada celda con la posición para poder colocar las
         # fichas posteriormente con más facilidad.
         for i in range(3):
             for j in range(3):
                 numero_celda = i * 3 + j
-                etiqueta_celda = tk.Label(root, text=str(numero_celda + 1), width=10, height=5, relief="solid", borderwidth=1)
+                etiqueta_celda = tk.Label(root, text=str(numero_celda + 1), width=20, height=10, relief="solid", borderwidth=1)
                 etiqueta_celda.grid(row=i, column=j)
                 self.tablero[numero_celda] = etiqueta_celda
 
@@ -60,7 +65,7 @@ class InterfazTresEnRaya:
 
         # Si el audio se ha obtenido correctamente, procedemos a colocar fichas y llamar a la API, pero
         # si el audio falla, mostramos mensaje de error.
-        if numero_obtenido != "Error":
+        if numero_obtenido != "Error" and self.lista_tablero[numero_obtenido - 1] is None:
             # Al número obtenido le restamos 1 para que coincida con el índice de la lista. Colocamos nuestra ficha X.
             self.colocar_ficha(numero_obtenido - 1, "X")
 
@@ -70,11 +75,14 @@ class InterfazTresEnRaya:
             ganador = self.ha_ganado()
             #print(ganador)
             if ganador:
-                self.etiqueta_victoria.config(text=f'¡Ha ganado el jugador {ganador}!')
+                if ganador == "Empate":
+                    self.etiqueta_victoria.config(text=f'¡Empate!')
+                else:
+                    self.etiqueta_victoria.config(text=f'¡Ha ganado el jugador {ganador}!')
+
                 self.boton_grabar_colocar.config(state="disabled")
-            elif ganador == "Empate":
-                self.etiqueta_victoria.config(text=f'¡Empate!')
-                self.boton_grabar_colocar.config(state="disabled")
+                funciones.guardarInfo(self.hora_inicio, self.lista_tablero, ganador)
+
             else:
 
                 # Procesamos el tablero/lista de la interfaz a texto y se lo pasamos a la API.
@@ -105,16 +113,18 @@ class InterfazTresEnRaya:
 
                 # Comprobamos si hay ganador de nuevo, una vez colocada la ficha de la API
                 ganador = self.ha_ganado()
-                print(ganador)
+                #print(ganador)
                 if ganador:
-                    self.etiqueta_victoria.config(text=f'¡Ha ganado el jugador {ganador}!')
+                    if ganador == "Empate":
+                        self.etiqueta_victoria.config(text=f'¡Empate!')
+                    else:
+                        self.etiqueta_victoria.config(text=f'¡Ha ganado el jugador {ganador}!')
+
                     self.boton_grabar_colocar.config(state="disabled")
-                elif ganador == "Empate":
-                    self.etiqueta_victoria.config(text=f'¡Empate!')
-                    self.boton_grabar_colocar.config(state="disabled")
+                    funciones.guardarInfo(self.hora_inicio, self.lista_tablero, ganador)
 
         else:
-            self.etiqueta_victoria.config(text='Error audio.')
+            self.etiqueta_victoria.config(text='Error ficha.')
 
     # Con esta función colocaremos la ficha en el tablero de la interfaz, y además en la lista.
     def colocar_ficha(self, numero_celda, ficha):
@@ -159,6 +169,8 @@ class InterfazTresEnRaya:
         self.etiqueta_victoria.config(text='')  # Limpiar el mensaje de victoria
         self.lista_tablero = [None] * 9
         self.boton_grabar_colocar.config(state="normal")
+        now = datetime.now()
+        self.hora_inicio = str(now.hour) + ":" + str(now.minute) + ":" + str(now.second)
 
 # Con esto iniciamos la interfaz, creamos el objeto de la interfaz.
 if __name__ == "__main__":
